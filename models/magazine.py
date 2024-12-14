@@ -24,3 +24,113 @@ class Magazine:
 
         self.name = name
         self.category = category
+    def __repr__(self):
+        return f"<Magazine {self.name}>"
+    # Getter for ID
+    @property
+    def id(self):
+        return self._id
+
+    # Setter for ID
+    @id.setter
+    def id(self, value):
+        if not isinstance(value, int):
+            raise ValueError("ID must be an integer.")
+        self._id = value
+
+    # Getter for name
+    @property
+    def name(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT name FROM magazines WHERE id = ?", (self.id,))
+        name = cursor.fetchone()["name"]
+        conn.close()
+        return name
+
+    # Setter for name
+    @name.setter
+    def name(self, value):
+        if not isinstance(value, str) or not (2 <= len(value) <= 16):
+            raise ValueError("Name must be a string between 2 and 16 characters.")
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE magazines SET name = ? WHERE id = ?", (value, self.id))
+        conn.commit()
+        conn.close()
+        self._name = value
+
+    # Getter for category
+    @property
+    def category(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT category FROM magazines WHERE id = ?", (self.id,))
+        category = cursor.fetchone()["category"]
+        conn.close()
+        return category
+
+    # Setter for category
+    @category.setter
+    def category(self, value):
+        if not isinstance(value, str) or len(value) == 0:
+            raise ValueError("Category must be a non-empty string.")
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE magazines SET category = ? WHERE id = ?", (value, self.id))
+        conn.commit()
+        conn.close()
+        self._category = value
+
+    # Method to get all articles associated with the magazine
+    def articles(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT articles.* FROM articles
+            JOIN magazines ON articles.magazine_id = magazines.id
+            WHERE magazines.id = ?
+        """, (self.id,))
+        articles = cursor.fetchall()
+        conn.close()
+        return articles  # You may want to return instances of an Article class
+
+    # Method to get all contributors (authors) associated with the magazine
+    def contributors(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT DISTINCT authors.* FROM authors
+            JOIN articles ON authors.id = articles.author_id
+            WHERE articles.magazine_id = ?
+        """, (self.id,))
+        contributors = cursor.fetchall()
+        conn.close()
+        return contributors  # You may want to return instances of an Author class
+
+    # Method to get all article titles for the magazine
+    def article_titles(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT title FROM articles
+            WHERE magazine_id = ?
+        """, (self.id,))
+        titles = [row["title"] for row in cursor.fetchall()]
+        conn.close()
+        return titles if titles else None
+
+    # Method to get authors who have written more than 2 articles for the magazine
+    def contributing_authors(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT authors.*, COUNT(articles.id) AS article_count FROM authors
+            JOIN articles ON authors.id = articles.author_id
+            WHERE articles.magazine_id = ?
+            GROUP BY authors.id
+            HAVING article_count > 2
+        """, (self.id,))
+        authors = cursor.fetchall()
+        conn.close()
+        return authors if authors else None
