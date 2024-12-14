@@ -12,3 +12,24 @@ class Article:
 
     def __repr__(self):
         return f'<Article {self.title}>'
+    #Getter for id
+    @property
+    def id(self):
+        return self._id
+    #Getter for title
+    @property
+    def title(self):
+        return self._title
+    # Getter for content
+    @property
+    def content(self):
+        return self._content
+    # Getter for author_id
+    @property
+    def author_id(self):
+        return self._author_id
+
+    # Getter for magazine_id
+    @property
+    def magazine_id(self):
+        return self._magazine_id
