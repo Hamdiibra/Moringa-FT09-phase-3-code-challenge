@@ -59,3 +59,29 @@ class Author:
         conn.commit()
         conn.close()
         self._name = value
+
+    # Method to get all articles associated with the author
+    def articles(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT articles.* FROM articles
+            JOIN authors ON articles.author_id = authors.id
+            WHERE authors.id = ?
+        """, (self.id,))
+        articles = cursor.fetchall()
+        conn.close()
+        return articles  
+
+    # Method to get all magazines associated with the author
+    def magazines(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT DISTINCT magazines.* FROM magazines
+            JOIN articles ON articles.magazine_id = magazines.id
+            WHERE articles.author_id = ?
+        """, (self.id,))
+        magazines = cursor.fetchall()
+        conn.close()
+        return magazines  
