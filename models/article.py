@@ -26,4 +26,56 @@ class Article:
         self.author_id = author_id
         self.magazine_id = magazine_id
 
-    
+    def __repr__(self):
+        return f'<Article {self.title}>'
+    @property
+    def title(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT title FROM articles WHERE id = ?", (self.id,))
+        title = cursor.fetchone()["title"]
+        conn.close()
+        return title
+
+    @property
+    def content(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT content FROM articles WHERE id = ?", (self.id,))
+        content = cursor.fetchone()["content"]
+        conn.close()
+        return content
+
+    @content.setter
+    def content(self, value):
+        if not isinstance(value, str) or len(value) == 0:
+            raise ValueError("Content cannot be empty.")
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("UPDATE articles SET content = ? WHERE id = ?", (value, self.id))
+        conn.commit()
+        conn.close()
+
+    def author(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT authors.* FROM authors
+            JOIN articles ON authors.id = articles.author_id
+            WHERE articles.id = ?
+        """, (self.id,))
+        author = cursor.fetchone()
+        conn.close()
+        return author
+
+    def magazine(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("""
+            SELECT magazines.* FROM magazines
+            JOIN articles ON magazines.id = articles.magazine_id
+            WHERE articles.id = ?
+        """, (self.id,))
+        magazine = cursor.fetchone()
+        conn.close()
+        return magazine
