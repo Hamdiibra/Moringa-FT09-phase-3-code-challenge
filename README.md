@@ -56,7 +56,7 @@ Use a web framework like Flask or FastAPI to expose your database functionality 
 
 Expand this README with clear examples of usage, an ER diagram, and contributing guidelines.
 
-## License
+## License:
 
 This project is licensed under the MIT License. See the LICENSE file for details.
 
