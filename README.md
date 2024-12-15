@@ -27,16 +27,18 @@ pip install sqlalchemy
 - SQLite (or any other SQL-compatible database of your choice)
 
 # Getting Started
-1. Clone the repository
-First, clone this repository to your local machine:
+1. Clone the repository.
 
-   ```bash
+First, clone this repository to your local machine:
+```bash
 git clone git@github.com:Hamdiibra/Moringa-FT09-phase-3-code-challenge.git
-   ```
+```
+
 2. Navigate to the project directory:
-   ```bash
-cd Moringa-FT09-phase-3-code-challenge.git
-   ```
+```bash
+cd  Moringa-FT09-phase-3-code-challenge.git
+```
+   
 # Next Steps
 
 1. Error Handling
