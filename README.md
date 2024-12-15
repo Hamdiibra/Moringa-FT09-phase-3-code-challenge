@@ -18,7 +18,6 @@ Contributing Authors: Query authors who have written more than two articles for 
 
 # Prerequisites
 To run this project, you need the following installed on your system:
-
 - Python (version 3.6+)
 - SQLAlchemy: Install it using pip:
 
