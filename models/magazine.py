@@ -24,6 +24,7 @@ class Magazine:
 
         self.name = name
         self.category = category
+
     def __repr__(self):
         return f"<Magazine {self.name}>"
     # Getter for ID

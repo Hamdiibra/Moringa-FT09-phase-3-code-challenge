@@ -5,6 +5,7 @@ class Article:
             raise ValueError("Title must be between 5 and 50 characters.")
         if not isinstance(content,str) or len(content) == 0:
             raise ValueError("Content cannot be empty.")
+        
         conn = get_db_connection()
         cursor = conn.cursor()
     # Insert the new article into the database if `id` is None
@@ -30,12 +31,25 @@ class Article:
         return f'<Article {self.title}>'
     @property
     def title(self):
+        if not hasattr(self, '_title'):  # Check if the title is already loaded
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT title FROM articles WHERE id = ?", (self.id,))
+            title = cursor.fetchone()["title"]
+            conn.close()
+            self._title = title  # Store the title in _title
+        return self._title
+    # Setter for title
+    @title.setter
+    def title(self, value):
+        if not isinstance(value, str) or len(value) == 0:
+            raise ValueError("Title must be a non-empty string.")
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT title FROM articles WHERE id = ?", (self.id,))
-        title = cursor.fetchone()["title"]
+        cursor.execute("UPDATE articles SET title = ? WHERE id = ?", (value, self.id))
+        conn.commit()
         conn.close()
-        return title
+        self._title = value  # Store the updated title in _title
 
     @property
     def content(self):
