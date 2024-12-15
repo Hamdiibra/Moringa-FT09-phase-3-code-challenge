@@ -32,6 +32,8 @@ class Author:
     # Setter for ID
     @id.setter
     def id(self, value):
+        if hasattr(self, '_id'):
+            raise AttributeError("ID cannot be modified once set.")
         if not isinstance(value, int):
             raise ValueError("ID must be an integer.")
         self._id = value
@@ -85,3 +87,17 @@ class Author:
         magazines = cursor.fetchall()
         conn.close()
         return magazines  
+    @classmethod
+    def all(cls):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM authors")
+        authors = cursor.fetchall()
+        conn.close()
+        return [cls(author["id"], author["name"]) for author in authors]
+    def delete(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM authors WHERE id = ?", (self.id,))
+        conn.commit()
+        conn.close()

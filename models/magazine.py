@@ -22,11 +22,9 @@ class Magazine:
         conn.commit()
         conn.close()
 
-        self.name = name
-        self.category = category
+        self._name = name
+        self._category = category
 
-    def __repr__(self):
-        return f"<Magazine {self.name}>"
     # Getter for ID
     @property
     def id(self):
@@ -35,6 +33,8 @@ class Magazine:
     # Setter for ID
     @id.setter
     def id(self, value):
+        if hasattr(self, '_id'):
+            raise AttributeError("ID cannot be modified once set.")
         if not isinstance(value, int):
             raise ValueError("ID must be an integer.")
         self._id = value
@@ -42,45 +42,25 @@ class Magazine:
     # Getter for name
     @property
     def name(self):
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT name FROM magazines WHERE id = ?", (self.id,))
-        name = cursor.fetchone()["name"]
-        conn.close()
-        return name
+        return self._name
 
     # Setter for name
     @name.setter
     def name(self, value):
         if not isinstance(value, str) or not (2 <= len(value) <= 16):
             raise ValueError("Name must be a string between 2 and 16 characters.")
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE magazines SET name = ? WHERE id = ?", (value, self.id))
-        conn.commit()
-        conn.close()
         self._name = value
 
     # Getter for category
     @property
     def category(self):
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT category FROM magazines WHERE id = ?", (self.id,))
-        category = cursor.fetchone()["category"]
-        conn.close()
-        return category
+        return self._category
 
     # Setter for category
     @category.setter
     def category(self, value):
         if not isinstance(value, str) or len(value) == 0:
             raise ValueError("Category must be a non-empty string.")
-        conn = get_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("UPDATE magazines SET category = ? WHERE id = ?", (value, self.id))
-        conn.commit()
-        conn.close()
         self._category = value
 
     # Method to get all articles associated with the magazine
@@ -135,3 +115,17 @@ class Magazine:
         authors = cursor.fetchall()
         conn.close()
         return authors if authors else None
+    @classmethod
+    def all(cls):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM magazines")
+        magazines = cursor.fetchall()
+        conn.close()
+        return [cls(magazine["id"], magazine["name"], magazine["category"]) for magazine in magazines]
+    def delete(self):
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM magazines WHERE id = ?", (self.id,))
+        conn.commit()
+        conn.close()

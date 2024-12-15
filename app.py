@@ -19,52 +19,50 @@ def main():
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    try:
+        # Start a transaction (implicitly handled by SQLite with commit)
+        conn.execute('BEGIN TRANSACTION')
 
-    '''
-        The following is just for testing purposes, 
-        you can modify it to meet the requirements of your implmentation.
-    '''
+        # Create an author instance (the name is validated in the Author class constructor)
+        author = Author(id=None, name=author_name)  # ID is None for new author
+        print(f"Author '{author.name}' added successfully.")
 
-    # Create an author
-    cursor.execute('INSERT INTO authors (name) VALUES (?)', (author_name,))
-    author_id = cursor.lastrowid # Use this to fetch the id of the newly created author
+        # Create a magazine instance (the name and category are validated in the Magazine class constructor)
+        magazine = Magazine(id=None, name=magazine_name, category=magazine_category)  # ID is None for new magazine
+        print(f"Magazine '{magazine.name}' added successfully.")
 
-    # Create a magazine
-    cursor.execute('INSERT INTO magazines (name, category) VALUES (?,?)', (magazine_name, magazine_category))
-    magazine_id = cursor.lastrowid # Use this to fetch the id of the newly created magazine
+        # Create an article instance (ID is None for new article)
+        article = Article(id=None, title=article_title, content=article_content, 
+                          author_id=author.id, magazine_id=magazine.id)  # Validate foreign keys for author and magazine
+        print(f"Article '{article.title}' added successfully.")
 
-    # Create an article
-    cursor.execute('INSERT INTO articles (title, content, author_id, magazine_id) VALUES (?, ?, ?, ?)',
-                   (article_title, article_content, author_id, magazine_id))
+        # Commit the transaction
+        conn.commit()
 
-    conn.commit()
+        # Fetch the latest data to display (use class methods instead of raw SQL queries)
+        print("\nFetching all authors, magazines, and articles:")
 
-    # Query the database for inserted records. 
-    # The following fetch functionality should probably be in their respective models
+        # Display all magazines, authors, and articles using the class methods
+        print("\nMagazines:")
+        for magazine in Magazine.all():  # Assuming you have a method `all()` in the Magazine class
+            print(magazine)
 
-    cursor.execute('SELECT * FROM magazines')
-    magazines = cursor.fetchall()
+        print("\nAuthors:")
+        for author in Author.all():  # Assuming you have a method `all()` in the Author class
+            print(author)
 
-    cursor.execute('SELECT * FROM authors')
-    authors = cursor.fetchall()
+        print("\nArticles:")
+        for article in Article.all():  # Assuming you have a method `all()` in the Article class
+            print(article)
 
-    cursor.execute('SELECT * FROM articles')
-    articles = cursor.fetchall()
+    except Exception as e:
+        # Rollback in case of any error
+        conn.rollback()
+        print(f"An error occurred: {e}")
 
-    conn.close()
-
-    # Display results
-    print("\nMagazines:")
-    for magazine in magazines:
-        print(Magazine(magazine["id"], magazine["name"], magazine["category"]))
-
-    print("\nAuthors:")
-    for author in authors:
-        print(Author(author["id"], author["name"]))
-
-    print("\nArticles:")
-    for article in articles:
-        print(Article(article["id"], article["title"], article["content"], article["author_id"], article["magazine_id"]))
+    finally:
+        # Always close the connection
+        conn.close()
 
 if __name__ == "__main__":
     main()
