@@ -24,38 +24,33 @@ To run this project, you need the following installed on your system:
 ```bash
 pip install sqlalchemy
 ```
-- SQLite (or any other SQL-compatible database of your choice)
+- Pipenv: Install it using pip:
 
-# Getting Started
-1. Clone the repository.
+``pip install pipenv``
+
+## Getting Started
+
+- Clone the repository.
 
 First, clone this repository to your local machine:
-```bash
-git clone git@github.com:Hamdiibra/Moringa-FT09-phase-3-code-challenge.git
-```
 
-2. Navigate to the project directory:
-```bash
-cd  Moringa-FT09-phase-3-code-challenge.git
-```
-   
-# Next Steps
+``git clone git@github.com:Hamdiibra/Moringa-FT09-phase-3-code-challenge.git``
 
-1. Error Handling
+Navigate to the project directory:
 
-Implement error handling for database operations (e.g., missing tables, connection errors).
+``cd Moringa-FT09-phase-3-code-challenge``
 
-2. Advanced Queries
+- Set up the virtual environment using Pipenv:
 
-Add features like filtering by date range, sorting, and full-text search.
+``pipenv install``
 
-3. API Integration (Optional)
+- Activate the Pipenv shell:
 
-Use a web framework like Flask or FastAPI to expose your database functionality as an API.
+``pipenv shell``
 
-4. Documentation
+Run the application or start interacting with the database as required.
 
-Expand this README with clear examples of usage, an ER diagram, and contributing guidelines.
+
 
 ## License:
 
